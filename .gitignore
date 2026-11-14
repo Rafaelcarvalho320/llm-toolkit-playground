@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+# Built from requirements.txt by scripts/build_wheels.py, locally and in CI.
+site/wheels/

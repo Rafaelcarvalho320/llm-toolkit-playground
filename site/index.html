@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LLM Toolkit Playground</title>
+  <meta name="description" content="Cinco bibliotecas Python para quem integra LLMs, rodando no navegador com Pyodide: conserto de JSON, mascaramento de dados pessoais, streaming com falhas injetadas e conferência de CSV.">
+  <meta name="theme-color" content="#09090b">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2309090b'/%3E%3Cpath d='M12 8c-3 0-3 2-3 4v1.5c0 1.2-.8 2.5-2.5 2.5 1.7 0 2.5 1.3 2.5 2.5V20c0 2 0 4 3 4M20 8c3 0 3 2 3 4v1.5c0 1.2.8 2.5 2.5 2.5-1.7 0-2.5 1.3-2.5 2.5V20c0 2 0 4-3 4' fill='none' stroke='%23fafafa' stroke-width='2.2' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='16' r='2.4' fill='%2360a5fa'/%3E%3C/svg%3E">
+  <link rel="preload" href="fonts/geist-variable-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <script>try { var t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}</script>
+</head>
+<body>
+  <a class="skip" href="#lab">Pular para o playground</a>
+  <div class="glow" aria-hidden="true"></div>
+
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="./" aria-label="LLM Toolkit Playground, início">
+        <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><use href="#ic-logo"/></svg>
+        <span>llm-toolkit</span>
+      </a>
+      <div class="nav-right">
+        <p class="runtime" id="runtime" aria-live="polite"><span class="runtime-dot"></span><span class="runtime-text">Carregando Python…</span></p>
+        <button class="icon-btn" id="theme" type="button" aria-label="Alternar tema"></button>
+        <a class="icon-btn" href="https://github.com/Rafaelcarvalho320/llm-toolkit-playground" aria-label="Código-fonte no GitHub">
+          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><use href="#ic-github"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero" aria-labelledby="titulo">
+      <h1 id="titulo">Ferramentas para integrar LLMs, rodando no seu navegador.</h1>
+      <p class="lede">Cinco bibliotecas Python sem dependências, executadas aqui mesmo com <a href="https://pyodide.org/">Pyodide</a>, o Python compilado para WebAssembly. Não existe servidor: nada do que você digitar sai desta página.</p>
+      <ul class="libs" aria-label="Bibliotecas usadas">
+        <li><a href="https://github.com/Rafaelcarvalho320/llm-json">llm-json</a></li>
+        <li><a href="https://github.com/Rafaelcarvalho320/pii-mask">pii-mask</a></li>
+        <li><a href="https://github.com/Rafaelcarvalho320/fake-llm">fake-llm</a></li>
+        <li><a href="https://github.com/Rafaelcarvalho320/sse-reader">sse-reader</a></li>
+        <li><a href="https://github.com/Rafaelcarvalho320/reconciliation-report">reconciliation-report</a></li>
+      </ul>
+      <div class="boot" id="boot" role="status">
+        <div class="boot-bar"><span id="boot-fill"></span></div>
+        <p id="boot-text">Baixando o Python (cerca de 10&nbsp;MB, só na primeira visita)…</p>
+      </div>
+    </section>
+
+    <section class="lab" id="lab" aria-label="Playground">
+      <div class="tabs" role="tablist" aria-label="Ferramentas">
+        <button role="tab" id="tab-json" aria-controls="panel-json" aria-selected="true"><span>JSON quebrado</span><small>llm-json</small></button>
+        <button role="tab" id="tab-pii" aria-controls="panel-pii" aria-selected="false" tabindex="-1"><span>Dados pessoais</span><small>pii-mask</small></button>
+        <button role="tab" id="tab-stream" aria-controls="panel-stream" aria-selected="false" tabindex="-1"><span>Streaming</span><small>fake-llm + sse-reader</small></button>
+        <button role="tab" id="tab-csv" aria-controls="panel-csv" aria-selected="false" tabindex="-1"><span>Conferência de CSV</span><small>reconciliation-report</small></button>
+      </div>
+
+      <!-- llm-json -->
+      <div class="panel" role="tabpanel" id="panel-json" aria-labelledby="tab-json">
+        <div class="panel-head">
+          <h2>Tire o JSON de uma resposta bagunçada</h2>
+          <p>Você pede JSON e o modelo responde com texto em volta, vírgula sobrando, comentário ou corta no meio. O <code>json.loads</code> recusa tudo isso. O <code>llm-json</code> recupera o valor e diz exatamente o que precisou consertar, inclusive quando faltam campos.</p>
+        </div>
+        <div class="examples" data-for="json" aria-label="Exemplos"></div>
+        <div class="grid-2">
+          <div class="box">
+            <label class="box-label" for="json-in">Resposta do modelo</label>
+            <textarea id="json-in" class="code-input" rows="13" spellcheck="false"></textarea>
+          </div>
+          <div class="box" aria-live="polite">
+            <div class="box-label">Resultado</div>
+            <div id="json-out" class="out"><p class="wait">O resultado aparece aqui quando o Python terminar de carregar.</p></div>
+          </div>
+        </div>
+        <details class="snippet"><summary>Como fica no código</summary>
+<pre><code><span class="k">from</span> llm_json <span class="k">import</span> extract
+
+found = extract(resposta_do_modelo)
+found.value       <span class="c"># o objeto Python</span>
+found.repairs     <span class="c"># ('unfenced', 'removed-trailing-comma', ...)</span>
+found.truncated   <span class="c"># True quando a resposta veio cortada</span></code></pre>
+        </details>
+      </div>
+
+      <!-- pii-mask -->
+      <div class="panel" role="tabpanel" id="panel-pii" aria-labelledby="tab-pii" hidden>
+        <div class="panel-head">
+          <h2>Tire os dados pessoais antes de mandar ao modelo</h2>
+          <p>CPF, CNPJ, cartão, telefone e e-mail são trocados por tokens antes do texto sair da sua aplicação, e voltam depois na resposta. Cada número é confirmado pelo dígito verificador: um número de pedido com 11 dígitos não é tratado como CPF.</p>
+        </div>
+        <div class="examples" data-for="pii" aria-label="Exemplos"></div>
+        <div class="grid-2">
+          <div class="box">
+            <label class="box-label" for="pii-in">Texto original</label>
+            <textarea id="pii-in" class="text-input" rows="9"></textarea>
+            <div class="controls">
+              <div class="seg" role="radiogroup" aria-label="Como substituir">
+                <label><input type="radio" name="pii-style" value="token" checked><span>Token reversível</span></label>
+                <label><input type="radio" name="pii-style" value="label"><span>Rótulo</span></label>
+                <label><input type="radio" name="pii-style" value="partial"><span>Parcial</span></label>
+              </div>
+              <label class="check"><input type="checkbox" id="pii-cep"><span>Mascarar CEP também</span></label>
+            </div>
+          </div>
+          <div class="box" aria-live="polite">
+            <div class="box-label">O que vai para o modelo</div>
+            <div id="pii-out" class="out"><p class="wait">O resultado aparece aqui quando o Python terminar de carregar.</p></div>
+          </div>
+        </div>
+        <div class="grid-2 roundtrip" id="pii-round">
+          <div class="box">
+            <label class="box-label" for="pii-reply">Resposta do modelo, ainda com tokens</label>
+            <textarea id="pii-reply" class="text-input" rows="4"></textarea>
+          </div>
+          <div class="box" aria-live="polite">
+            <div class="box-label"><span>Depois do <code>vault.unmask()</code></span></div>
+            <div id="pii-back" class="out"></div>
+          </div>
+        </div>
+        <details class="snippet"><summary>Como fica no código</summary>
+<pre><code><span class="k">from</span> pii_mask <span class="k">import</span> mask
+
+mascarado, vault = mask(texto)
+resposta = chamar_modelo(mascarado)
+vault.missing(resposta)        <span class="c"># tokens que o modelo não devolveu</span>
+final = vault.unmask(resposta)</code></pre>
+        </details>
+      </div>
+
+      <!-- fake-llm + sse-reader -->
+      <div class="panel" role="tabpanel" id="panel-stream" aria-labelledby="tab-stream" hidden>
+        <div class="panel-head">
+          <h2>Veja um streaming quebrar, e não quebrar</h2>
+          <p>O <code>fake-llm</code> faz o papel do modelo: primeiro responde HTTP 429, depois manda a resposta em eventos SSE, picotados nos pontos que derrubam leitores ingênuos, inclusive no meio de um caractere acentuado. Os mesmos bytes passam por um leitor comum e pelo <code>sse-reader</code>.</p>
+        </div>
+        <div class="grid-2 stream-grid">
+          <div class="box">
+            <label class="box-label" for="stream-in">O que o modelo responde</label>
+            <textarea id="stream-in" class="text-input" rows="4"></textarea>
+            <div class="toggles">
+              <label class="switch"><input type="checkbox" id="stream-429" checked><span class="track"></span><span>Primeira chamada recebe <b>HTTP 429</b> com <code>Retry-After: 1</code></span></label>
+              <label class="switch"><input type="checkbox" id="stream-trunc"><span class="track"></span><span>Resposta cortada no limite de tokens</span></label>
+            </div>
+            <div class="field">
+              <span class="field-label" id="lbl-split">Como os bytes chegam</span>
+              <div class="seg" role="radiogroup" aria-labelledby="lbl-split">
+                <label><input type="radio" name="stream-split" value="awkward" checked><span>Picotados</span></label>
+                <label><input type="radio" name="stream-split" value="whole"><span>Um evento por pedaço</span></label>
+              </div>
+            </div>
+            <div class="field">
+              <span class="field-label" id="lbl-nl">Fim de linha</span>
+              <div class="seg" role="radiogroup" aria-labelledby="lbl-nl">
+                <label><input type="radio" name="stream-nl" value="lf" checked><span class="mono">\n</span></label>
+                <label><input type="radio" name="stream-nl" value="crlf"><span class="mono">\r\n</span></label>
+              </div>
+            </div>
+            <button class="primary" id="stream-go" type="button" disabled>
+              <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><use href="#ic-play"/></svg>Transmitir
+            </button>
+          </div>
+          <div class="box stream-out" aria-live="polite">
+            <div class="box-label">Chamadas</div>
+            <ol class="attempts" id="stream-attempts"><li class="muted">Clique em <b>Transmitir</b>.</li></ol>
+            <div class="box-label wire-label"><span>Bytes na rede</span><span id="wire-meta"></span></div>
+            <div class="wire" id="stream-wire" tabindex="0" aria-label="Bytes recebidos"></div>
+            <div class="readers">
+              <div class="reader">
+                <div class="reader-head"><b>Leitor comum</b><code>chunk.decode().split("\n")</code></div>
+                <p class="reader-text" id="naive-text"></p>
+                <div class="reader-foot" id="naive-foot"></div>
+              </div>
+              <div class="reader">
+                <div class="reader-head"><b>sse-reader</b><code>iter_json(chunks)</code></div>
+                <p class="reader-text" id="sse-text"></p>
+                <div class="reader-foot" id="sse-foot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <details class="snippet"><summary>Como fica no código</summary>
+<pre><code><span class="k">from</span> fake_llm <span class="k">import</span> FakeLLM, Failure, Rule
+<span class="k">from</span> sse_reader <span class="k">import</span> iter_json
+
+fake = FakeLLM([Rule(<span class="s">"previsão"</span>, [Failure(<span class="n">429</span>, retry_after=<span class="n">1</span>), <span class="s">"Olá, João! ..."</span>])])
+
+<span class="k">for</span> chunk <span class="k">in</span> iter_json(resposta.iter_content(chunk_size=<span class="k">None</span>)):
+    print(chunk[<span class="s">"choices"</span>][<span class="n">0</span>][<span class="s">"delta"</span>].get(<span class="s">"content"</span>, <span class="s">""</span>), end=<span class="s">""</span>)</code></pre>
+        </details>
+      </div>
+
+      <!-- reconciliation-report -->
+      <div class="panel" role="tabpanel" id="panel-csv" aria-labelledby="tab-csv" hidden>
+        <div class="panel-head">
+          <h2>Compare duas exportações e ache cada divergência</h2>
+          <p>Cole dois CSVs, escolha a chave e os campos. O <code>reconciliation-report</code> normaliza antes de comparar, então <q>1.234,50</q> e <q>1234.5</q> são o mesmo valor e <q>José</q> e <q>JOSE</q> também. Sobra só o que é diferença de verdade.</p>
+        </div>
+        <div class="examples" data-for="csv" aria-label="Exemplos"></div>
+        <div class="grid-2">
+          <div class="box">
+            <div class="box-label"><input class="name-input" id="csv-left-name" value="erp.csv" aria-label="Nome do arquivo A"></div>
+            <textarea id="csv-left" class="code-input" rows="9" spellcheck="false" aria-label="CSV A"></textarea>
+          </div>
+          <div class="box">
+            <div class="box-label"><input class="name-input" id="csv-right-name" value="loja.csv" aria-label="Nome do arquivo B"></div>
+            <textarea id="csv-right" class="code-input" rows="9" spellcheck="false" aria-label="CSV B"></textarea>
+          </div>
+        </div>
+        <div class="box schema">
+          <div class="schema-row">
+            <label class="field-label" for="csv-key">Chave</label>
+            <select id="csv-key"></select>
+            <select id="csv-key-norm" aria-label="Normalização da chave"></select>
+          </div>
+          <div class="field-label">Campos comparados</div>
+          <div id="csv-fields" class="fields"></div>
+        </div>
+        <div id="csv-out" class="csv-out" aria-live="polite"><p class="wait">O resultado aparece aqui quando o Python terminar de carregar.</p></div>
+        <details class="snippet"><summary>Como fica no código</summary>
+<pre><code><span class="k">from</span> reconciler <span class="k">import</span> CsvSource, Schema, as_markdown, reconcile
+
+schema = Schema.build(
+    key=[<span class="s">"pedido"</span>],
+    compare=[<span class="s">"cliente"</span>, <span class="s">"total"</span>],
+    normalizers={<span class="s">"cliente"</span>: <span class="s">"unaccented"</span>, <span class="s">"total"</span>: <span class="s">"money"</span>},
+    tolerances={<span class="s">"total"</span>: <span class="s">"0.01"</span>},
+)
+result = reconcile(CsvSource(<span class="s">"erp.csv"</span>), CsvSource(<span class="s">"loja.csv"</span>, delimiter=<span class="s">";"</span>), schema)
+print(as_markdown(result))</code></pre>
+        </details>
+      </div>
+    </section>
+
+    <section class="about" aria-labelledby="como">
+      <h2 id="como">Como funciona</h2>
+      <div class="about-grid">
+        <div><h3>Python de verdade</h3><p>Não é uma reimplementação em JavaScript. O Pyodide roda o CPython compilado para WebAssembly, e as bibliotecas são instaladas a partir dos mesmos commits que passam nos testes de cada repositório.</p></div>
+        <div><h3>Sem servidor</h3><p>A página é estática e fica no GitHub Pages. O processamento acontece no seu navegador; os textos e CSVs que você cola não são enviados para lugar nenhum.</p></div>
+        <div><h3>Sem dependências</h3><p>Só funciona porque as cinco bibliotecas usam apenas a biblioteca padrão do Python. Isso também as deixa fáceis de auditar e de colocar em qualquer projeto.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <p>Código aberto, licença MIT. <a href="https://github.com/Rafaelcarvalho320/llm-toolkit-playground">Código-fonte</a></p>
+      <p>Também: <a href="https://rafaelcarvalho320.github.io/br-api-status/">status das APIs públicas brasileiras</a></p>
+    </div>
+  </footer>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="ic-logo" viewBox="0 0 20 20"><path d="M7.5 4C5.5 4 5.5 5.3 5.5 6.6v1.2c0 .8-.6 1.7-1.8 1.7 1.2 0 1.8.9 1.8 1.7v1.2c0 1.3 0 2.6 2 2.6M12.5 4c2 0 2 1.3 2 2.6v1.2c0 .8.6 1.7 1.8 1.7-1.2 0-1.8.9-1.8 1.7v1.2c0 1.3 0 2.6-2 2.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="10" cy="9.6" r="1.7" fill="var(--accent)"/></symbol>
+    <symbol id="ic-check" viewBox="0 0 20 20"><path d="M5.5 10.4l3 3 6-6.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="ic-alert" viewBox="0 0 20 20"><path d="M10 5.5v5.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="10" cy="14.4" r="1.3" fill="currentColor"/></symbol>
+    <symbol id="ic-x" viewBox="0 0 20 20"><path d="M6.5 6.5l7 7m0-7l-7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="ic-play" viewBox="0 0 20 20"><path d="M7 5.2v9.6a.6.6 0 0 0 .9.5l7.4-4.8a.6.6 0 0 0 0-1L7.9 4.7a.6.6 0 0 0-.9.5z" fill="currentColor"/></symbol>
+    <symbol id="ic-copy" viewBox="0 0 20 20"><rect x="7" y="7" width="9" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M13 7V5.5A1.5 1.5 0 0 0 11.5 4h-6A1.5 1.5 0 0 0 4 5.5v6A1.5 1.5 0 0 0 5.5 13H7" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="ic-download" viewBox="0 0 20 20"><path d="M10 4v8m-3.5-3.5L10 12l3.5-3.5M4.5 15.5h11" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="ic-sun" viewBox="0 0 20 20"><circle cx="10" cy="10" r="3.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10 2.5v1.8M10 15.7v1.8M2.5 10h1.8M15.7 10h1.8M4.7 4.7l1.3 1.3M14 14l1.3 1.3M4.7 15.3L6 14M14 6l1.3-1.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="ic-moon" viewBox="0 0 20 20"><path d="M16 12.2A6.5 6.5 0 0 1 7.8 4a6.5 6.5 0 1 0 8.2 8.2z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+    <symbol id="ic-github" viewBox="0 0 16 16"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></symbol>
+  </svg>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

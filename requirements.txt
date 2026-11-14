@@ -1,0 +1,7 @@
+# The libraries the playground runs, pinned to exact commits. The same pins are
+# used for the tests here and for the wheels the browser loads.
+llm-json @ git+https://github.com/Rafaelcarvalho320/llm-json@0639d4c72eb20c3e5408845b4bea61d7b21ed6be
+pii-mask @ git+https://github.com/Rafaelcarvalho320/pii-mask@712675102dc2d9f2dcc718c35783a1d71aa05062
+fake-llm @ git+https://github.com/Rafaelcarvalho320/fake-llm@d37a901d2a70087dc47fbeee97df4ab07bb74e7b
+sse-reader @ git+https://github.com/Rafaelcarvalho320/sse-reader@756d02460c57633e8fcc57b5521dcc5f82e2dd31
+reconciliation-report @ git+https://github.com/Rafaelcarvalho320/reconciliation-report@e674ec399d466b5d9cf31d3714d3f518e752844f
