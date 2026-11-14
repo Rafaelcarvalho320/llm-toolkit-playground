@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>LLM Toolkit Playground</title>
   <meta name="description" content="Cinco bibliotecas Python para quem integra LLMs, rodando no navegador com Pyodide: conserto de JSON, mascaramento de dados pessoais, streaming com falhas injetadas e conferência de CSV.">
   <meta name="theme-color" content="#09090b">
@@ -10,7 +11,7 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2309090b'/%3E%3Cpath d='M12 8c-3 0-3 2-3 4v1.5c0 1.2-.8 2.5-2.5 2.5 1.7 0 2.5 1.3 2.5 2.5V20c0 2 0 4 3 4M20 8c3 0 3 2 3 4v1.5c0 1.2.8 2.5 2.5 2.5-1.7 0-2.5 1.3-2.5 2.5V20c0 2 0 4-3 4' fill='none' stroke='%23fafafa' stroke-width='2.2' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='16' r='2.4' fill='%2360a5fa'/%3E%3C/svg%3E">
   <link rel="preload" href="fonts/geist-variable-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="style.css">
-  <script>try { var t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}</script>
+  <script src="theme.js"></script>
 </head>
 <body>
   <a class="skip" href="#lab">Pular para o playground</a>
@@ -250,7 +251,7 @@ print(as_markdown(result))</code></pre>
     </div>
   </footer>
 
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <svg class="sprite" width="0" height="0" aria-hidden="true">
     <symbol id="ic-logo" viewBox="0 0 20 20"><path d="M7.5 4C5.5 4 5.5 5.3 5.5 6.6v1.2c0 .8-.6 1.7-1.8 1.7 1.2 0 1.8.9 1.8 1.7v1.2c0 1.3 0 2.6 2 2.6M12.5 4c2 0 2 1.3 2 2.6v1.2c0 .8.6 1.7 1.8 1.7-1.2 0-1.8.9-1.8 1.7v1.2c0 1.3 0 2.6-2 2.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="10" cy="9.6" r="1.7" fill="var(--accent)"/></symbol>
     <symbol id="ic-check" viewBox="0 0 20 20"><path d="M5.5 10.4l3 3 6-6.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="ic-alert" viewBox="0 0 20 20"><path d="M10 5.5v5.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="10" cy="14.4" r="1.3" fill="currentColor"/></symbol>

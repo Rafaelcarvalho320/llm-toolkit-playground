@@ -2,7 +2,9 @@
 // five libraries from wheels built at deploy time, and calls site/py/playground.py.
 // No framework and no build step.
 
-const PYODIDE_URL = "https://cdn.jsdelivr.net/npm/pyodide@314.0.7/pyodide.mjs";
+// Served from this origin (scripts/vendor_pyodide.py), so the page runs no
+// third-party code and its CSP can forbid every other origin.
+const PYODIDE_URL = new URL("pyodide/pyodide.mjs", location.href).href;
 
 const $ = (id) => document.getElementById(id);
 const esc = (value) =>

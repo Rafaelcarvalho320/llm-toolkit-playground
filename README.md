@@ -27,10 +27,11 @@ servidor: nada do que se digita sai do navegador.
 ```
 GitHub Actions (a cada push)
   ├─ pip wheel das 5 bibliotecas, nos commits fixados em requirements.txt
-  └─ publica site/ + wheels/ no GitHub Pages
+  ├─ baixa o Pyodide do npm e confere o hash SHA-512 fixado no repositório
+  └─ publica site/ + wheels/ + pyodide/ no GitHub Pages
 
 Navegador
-  ├─ carrega o Pyodide da jsDelivr (Python 3.14)
+  ├─ carrega o Pyodide do próprio site (Python 3.14)
   ├─ instala as 5 wheels a partir do próprio site
   └─ chama site/py/playground.py, que devolve JSON para a página
 ```
@@ -42,8 +43,13 @@ Navegador
 - **A ponte é fina e testada.** `site/py/playground.py` recebe e devolve
   strings JSON, então o JavaScript nunca converte objetos Python. Os mesmos
   arquivos são testados com CPython em `tests/`.
+- **Nada sai do navegador, e isso é garantido pelo navegador.** O Pyodide é
+  servido pelo próprio site, então a página não executa código de terceiros. A
+  Content Security Policy só permite conexões para a própria origem: um script
+  que tentasse enviar um CPF colado para fora seria bloqueado.
 - **Versões fixadas.** As bibliotecas estão fixadas por commit em
-  `requirements.txt`, e o Pyodide, por versão exata em `site/app.js`.
+  `requirements.txt`, o Pyodide por versão e hash em
+  `scripts/vendor_pyodide.py`, e as actions do GitHub por hash de commit.
 - **A página é HTML, CSS e JS puros**, sem framework nem build, com tema claro
   e escuro e as fontes Geist hospedadas no próprio site.
 
@@ -53,6 +59,7 @@ Navegador
 $ python -m venv .venv && . .venv/bin/activate
 $ pip install -r requirements-dev.txt
 $ python scripts/build_wheels.py        # gera site/wheels/
+$ python scripts/vendor_pyodide.py      # gera site/pyodide/
 $ python -m http.server -d site 8000    # abra http://localhost:8000
 ```
 
@@ -81,7 +88,9 @@ nothing typed leaves the browser.
   every divergence after normalisation, as a table, Markdown or CSV.
 
 The libraries are installed from wheels built in CI from commits pinned in
-`requirements.txt`. The bridge module in `site/py/` is tested with CPython.
+`requirements.txt`. Pyodide is served from the site itself, verified against a
+pinned SHA-512, and a Content Security Policy restricts every connection to the
+page's own origin, so pasted data cannot be sent anywhere. The bridge module in `site/py/` is tested with CPython.
 Code and docstrings are in English; the sections above are in Portuguese.
 
 ## Licença

@@ -4,3 +4,5 @@ __pycache__/
 .ruff_cache/
 # Built from requirements.txt by scripts/build_wheels.py, locally and in CI.
 site/wheels/
+# Downloaded and hash-checked by scripts/vendor_pyodide.py.
+site/pyodide/
